@@ -19,7 +19,7 @@ import { ResultPanel } from '../components/ResultPanel';
 import { RoiOverlay } from '../components/RoiOverlay';
 
 // RNLabelScannerView = CameraX PreviewView. LabelScanner = NativeModules methods.
-import { LabelScanner, RNLabelScannerView } from '../native/LabelScanner';
+import { LabelScanner, RNLabelScannerView, startup } from '../native/LabelScanner';
 import type { Roi, ScanResult, TemplateProfile } from '../types';
 import { DEFAULT_ROI } from '../types';
 
@@ -54,6 +54,7 @@ export function ScannerScreen({
 
   // [] = this function is created once. Pressable can keep a stable onPress.
   const requestPermission = useCallback(async () => {
+    startup('ScannerScreen.requestPermission');
     if (Platform.OS !== 'android') {
       setPermission('denied');
       return;
@@ -73,10 +74,16 @@ export function ScannerScreen({
 
   // Run on first mount: if the user already allowed camera, skip the explainer.
   useEffect(() => {
+    startup('ScannerScreen.tsx ScannerScreen.useEffect mount run on 1st mount');
     if (Platform.OS !== 'android') {
       return;
     }
     PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA).then(granted => {
+      startup(
+        granted
+          ? 'ScannerScreen.checkCameraPermission granted'
+          : 'ScannerScreen.checkCameraPermission needs prompt',
+      );
       if (granted) {
         setPermission('granted');
       }
@@ -136,7 +143,10 @@ export function ScannerScreen({
           templateJson={templateJson}
           scanningEnabled
           onScanResult={handleScanResult}
-          onScanError={event => setError(event.nativeEvent.message)}
+          onScanError={event => {
+            startup('ScannerScreen.onScanError');
+            setError(event.nativeEvent.message);
+          }}
         />
       </View>
       {/* JS overlay on top of the preview. Drag/resize updates `roi` state. */}

@@ -21,7 +21,12 @@ class ScanPipeline {
     private var barcodeFormatsSignature: String? = null
     val suppressor = DuplicateSuppressor()
 
+    init {
+        ScanLog.enter("ScanPipeline.init")
+    }
+
     fun applyTemplate(template: TemplateProfile) {
+        ScanLog.enter("ScanPipeline.applyTemplate")
         suppressor.windowMs = template.duplicateWindowMs
         val signature = template.barcode.formats.sorted().joinToString(",")
         if (signature != barcodeFormatsSignature) {
@@ -42,6 +47,7 @@ class ScanPipeline {
         source: String,
         includeOcr: Boolean,
     ): ScanResultDto {
+        ScanLog.enter("ScanPipeline.processBitmap")
         applyTemplate(template)
         val startedAt = SystemClock.elapsedRealtime()
         val cropped = RoiCropper.crop(bitmap, roi)
@@ -87,6 +93,7 @@ class ScanPipeline {
     }
 
     fun loadAssetBitmap(context: Context, assetPath: String): Bitmap {
+        ScanLog.enter("ScanPipeline.loadAssetBitmap")
         context.assets.open(assetPath).use { stream ->
             return BitmapFactory.decodeStream(stream)
                 ?: throw IllegalStateException("Could not decode $assetPath")
@@ -94,6 +101,7 @@ class ScanPipeline {
     }
 
     fun close() {
+        ScanLog.enter("ScanPipeline.close")
         barcodeClient.close()
         textClient.close()
     }

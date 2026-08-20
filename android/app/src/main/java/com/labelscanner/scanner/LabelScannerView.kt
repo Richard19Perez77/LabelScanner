@@ -2,9 +2,7 @@ package com.labelscanner.scanner
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.graphics.Rect
 import android.os.SystemClock
-import android.util.Log
 import android.widget.FrameLayout
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -24,7 +22,6 @@ import com.facebook.react.uimanager.events.Event
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -41,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 @SuppressLint("ViewConstructor")
 class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayout(reactContext) {
+    
     // TextureView-based preview; more compatible with RN's layout than the default SurfaceView.
     private val previewView = PreviewView(reactContext).apply {
         implementationMode = PreviewView.ImplementationMode.COMPATIBLE
@@ -76,6 +74,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
     var template: TemplateProfile = TemplateProfile.parse(DEFAULT_TEMPLATE_JSON)
 
     init {
+        ScanLog.enter("LabelScannerView.init")
         addView(previewView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         pipeline.applyTemplate(template)
         current = this
@@ -87,6 +86,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
     }
 
     override fun onAttachedToWindow() {
+        ScanLog.enter("LabelScannerView.onAttachedToWindow")
         super.onAttachedToWindow()
         current = this
         cameraStarted = false
@@ -95,6 +95,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
     }
 
     override fun onDetachedFromWindow() {
+        ScanLog.enter("LabelScannerView.onDetachedFromWindow")
         if (current === this) {
             current = null
         }
@@ -105,6 +106,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
 
     /** JS sent a new template JSON: rebuild validators and ML Kit format filter. */
     fun applyTemplateJson(json: String) {
+        ScanLog.enter("LabelScannerView.applyTemplateJson")
         template = TemplateProfile.parse(json)
         pipeline.applyTemplate(template)
         barcodeClient.close()
@@ -120,17 +122,16 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
             return
         }
         if (width <= 0 || height <= 0) {
-            Log.w(TAG, "Preview still 0x0, retrying camera start")
             post { startCamera() }
             return
         }
         // CameraX bind needs the Activity as LifecycleOwner (pause/resume/destroy).
         val activity = reactContext.currentActivity as? LifecycleOwner
         if (activity == null) {
-            Log.w(TAG, "No activity yet, retrying camera start")
             postDelayed({ startCamera() }, 200)
             return
         }
+        ScanLog.enter("LabelScannerView.startCamera")
         val future = ProcessCameraProvider.getInstance(reactContext)
         future.addListener(
             {
@@ -157,9 +158,8 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
                     )
                     cameraProvider = provider
                     cameraStarted = true
-                    Log.i(TAG, "Camera bound ${width}x${height}")
+                    ScanLog.enter("LabelScannerView.startCamera bound")
                 } catch (error: Exception) {
-                    Log.e(TAG, "Failed to start camera", error)
                     emitError(error.message ?: "Failed to start camera")
                 }
             },
@@ -168,6 +168,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
     }
 
     private fun stopCamera() {
+        ScanLog.enter("LabelScannerView.stopCamera")
         cameraProvider?.unbindAll()
     }
 
@@ -200,7 +201,6 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
         try {
             bitmap = imageProxy.toBitmap()
         } catch (error: Exception) {
-            Log.w(TAG, "Failed to copy analysis frame", error)
             imageProxy.close()
             return
         }
@@ -234,32 +234,19 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
                     SystemClock.elapsedRealtime(),
                 )
                 emitResult(dto.copy(duplicate = duplicate))
-                logBarcodeGathered(
-                    codesInFrame = codes.size,
-                    hit = hit,
-                    roiRect = roiRect,
-                    frameWidth = frameWidth,
-                    frameHeight = frameHeight,
-                    uprightWidth = uprightWidth,
-                    uprightHeight = uprightHeight,
-                    rotation = rotation,
-                    barcode = barcode,
-                    dto = dto,
-                    duplicate = duplicate,
-                )
             }
-            .addOnFailureListener(barcodeExecutor) { error ->
-                Log.w(TAG, "Barcode analysis failed", error)
-            }
+            .addOnFailureListener(barcodeExecutor) { /* no idle logs */ }
             .addOnCompleteListener { bitmap.recycle() }
     }
 
     fun resetDuplicates() {
+        ScanLog.enter("LabelScannerView.resetDuplicates")
         pipeline.suppressor.reset()
     }
 
     /** Still photo + OCR pipeline (lot, expiry, etc.). Heavier than live barcodes. */
     fun captureOcr() {
+        ScanLog.enter("LabelScannerView.captureOcr")
         val capture = imageCapture
         if (capture == null) {
             emitError("Camera is not ready")
@@ -272,6 +259,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
             analysisExecutor,
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
+                    ScanLog.enter("LabelScannerView.captureOcr onCaptureSuccess")
                     try {
                         val bitmap: Bitmap = image.toBitmap()
                         val result = pipeline.processBitmap(
@@ -291,6 +279,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
                 }
 
                 override fun onError(exception: ImageCaptureException) {
+                    ScanLog.enter("LabelScannerView.captureOcr onError")
                     capturing.set(false)
                     emitError(exception.message ?: "Capture failed")
                 }
@@ -299,108 +288,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
     }
 
     fun emitResult(result: ScanResultDto) {
-        Log.d(
-            TAG,
-            "onScanResult source=${result.source} barcode=${result.barcode?.value} " +
-                    "format=${result.barcode?.format} valid=${result.barcode?.valid} " +
-                    "duplicate=${result.duplicate} latencyMs=${result.latencyMs}",
-        )
         post { dispatch("onScanResult", result.toWritableMap()) }
-    }
-
-    /** Verbose ML Kit dump. Filter Logcat by [TAG] (`LabelScannerView`). */
-    private fun logBarcodeGathered(
-        codesInFrame: Int,
-        hit: Barcode,
-        roiRect: Rect,
-        frameWidth: Int,
-        frameHeight: Int,
-        uprightWidth: Int,
-        uprightHeight: Int,
-        rotation: Int,
-        barcode: BarcodeResult,
-        dto: ScanResultDto,
-        duplicate: Boolean,
-    ) {
-        val box = hit.boundingBox
-        val corners = hit.cornerPoints?.joinToString { "(${it.x},${it.y})" }
-        Log.d(TAG, "barcode codesInFrame=$codesInFrame")
-        Log.d(
-            TAG,
-            "barcode rotationDeg=$rotation frame=${frameWidth}x${frameHeight} upright=${uprightWidth}x${uprightHeight}"
-        )
-        Log.d(TAG, "barcode roi=$roiRect")
-        Log.d(TAG, "barcode rawValue=${hit.rawValue}")
-        Log.d(TAG, "barcode displayValue=${hit.displayValue}")
-        Log.d(TAG, "barcode format=${MlKitFormats.name(hit.format)} (${hit.format})")
-        Log.d(TAG, "barcode valueType=${mlKitValueTypeName(hit.valueType)} (${hit.valueType})")
-        Log.d(TAG, "barcode boundingBox=$box")
-        Log.d(TAG, "barcode cornerPoints=$corners")
-        hit.url?.let { Log.d(TAG, "barcode urlBookmark title=${it.title} url=${it.url}") }
-        hit.wifi?.let {
-            Log.d(
-                TAG,
-                "barcode wifi ssid=${it.ssid} password=${it.password} encryptionType=${it.encryptionType}"
-            )
-        }
-        hit.email?.let {
-            Log.d(
-                TAG,
-                "barcode email address=${it.address} subject=${it.subject} body=${it.body} type=${it.type}"
-            )
-        }
-        hit.phone?.let { Log.d(TAG, "barcode phone number=${it.number} type=${it.type}") }
-        hit.sms?.let {
-            Log.d(
-                TAG,
-                "barcode sms phoneNumber=${it.phoneNumber} message=${it.message}"
-            )
-        }
-        hit.geoPoint?.let { Log.d(TAG, "barcode geo lat=${it.lat} lng=${it.lng}") }
-        hit.contactInfo?.let {
-            Log.d(
-                TAG,
-                "barcode contact name=${it.name?.formattedName} org=${it.organization} title=${it.title}"
-            )
-        }
-        hit.calendarEvent?.let {
-            Log.d(
-                TAG,
-                "barcode calendar summary=${it.summary} description=${it.description} location=${it.location}"
-            )
-        }
-        hit.driverLicense?.let {
-            Log.d(
-                TAG,
-                "barcode driverLicense ${it.licenseNumber} ${it.firstName} ${it.lastName} ${it.expiryDate}",
-            )
-        }
-        Log.d(
-            TAG,
-            "barcode validated value=${barcode.value} format=${barcode.format} valid=${barcode.valid} checksumOk=${barcode.checksumOk}",
-        )
-        Log.d(
-            TAG,
-            "dto source=${dto.source} duplicate=$duplicate latencyMs=${dto.latencyMs} rawText=${dto.rawText} fields=${dto.fields}",
-        )
-    }
-
-    private fun mlKitValueTypeName(valueType: Int): String {
-        return when (valueType) {
-            Barcode.TYPE_CONTACT_INFO -> "CONTACT_INFO"
-            Barcode.TYPE_EMAIL -> "EMAIL"
-            Barcode.TYPE_ISBN -> "ISBN"
-            Barcode.TYPE_PHONE -> "PHONE"
-            Barcode.TYPE_PRODUCT -> "PRODUCT"
-            Barcode.TYPE_SMS -> "SMS"
-            Barcode.TYPE_TEXT -> "TEXT"
-            Barcode.TYPE_URL -> "URL"
-            Barcode.TYPE_WIFI -> "WIFI"
-            Barcode.TYPE_GEO -> "GEO"
-            Barcode.TYPE_CALENDAR_EVENT -> "CALENDAR_EVENT"
-            Barcode.TYPE_DRIVER_LICENSE -> "DRIVER_LICENSE"
-            else -> "UNKNOWN"
-        }
     }
 
     fun emitError(message: String) {
@@ -419,6 +307,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
     }
 
     fun release() {
+        ScanLog.enter("LabelScannerView.release")
         stopCamera()
         barcodeClient.close()
         pipeline.close()
@@ -427,8 +316,6 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
     }
 
     companion object {
-        private const val TAG = "LabelScannerView"
-
         /** Last mounted scanner; used by the native module for capture / template from JS. */
         @Volatile
         var current: LabelScannerView? = null

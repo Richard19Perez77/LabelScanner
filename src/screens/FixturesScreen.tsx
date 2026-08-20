@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LabelScanner } from '../native/LabelScanner';
+import { LabelScanner, startup } from '../native/LabelScanner';
 import type { ScanResult, TemplateProfile } from '../types';
 import invalidEan from '../../testdata/expected/invalid-ean-checksum.json';
 import invalidLot from '../../testdata/expected/invalid-lot-regex.json';
@@ -74,6 +74,7 @@ export function FixturesScreen({ templateJson, template, onBack }: Props) {
   }, [runs]);
 
   const runOne = async (file: string) => {
+    startup('FixturesScreen.runOne');
     try {
       const actual = await LabelScanner.processTestImage(file, templateJson);
       setRuns(current => ({ ...current, [file]: { actual } }));
@@ -86,6 +87,7 @@ export function FixturesScreen({ templateJson, template, onBack }: Props) {
   };
 
   const runAll = async () => {
+    startup('FixturesScreen.runAll');
     setBusy(true);
     await LabelScanner.resetDuplicateWindow();
     for (const fixture of FIXTURES) {

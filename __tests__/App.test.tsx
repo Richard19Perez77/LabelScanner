@@ -9,6 +9,7 @@ jest.mock('../src/native/LabelScanner', () => {
   const { View } = require('react-native');
   return {
     RNLabelScannerView: View,
+    startup: jest.fn(),
     LabelScanner: {
       captureOcr: jest.fn(async () => true),
       processTestImage: jest.fn(async () => ({

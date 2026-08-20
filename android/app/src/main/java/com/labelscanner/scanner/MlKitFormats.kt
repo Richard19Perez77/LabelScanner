@@ -17,6 +17,7 @@ object MlKitFormats {
     }
 
     fun flags(formats: List<String>): Int {
+        ScanLog.enter("MlKitFormats.flags")
         if (formats.isEmpty()) {
             return Barcode.FORMAT_ALL_FORMATS
         }

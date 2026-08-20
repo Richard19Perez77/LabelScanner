@@ -51,6 +51,7 @@ data class TemplateProfile(
 ) {
     companion object {
         fun parse(json: String): TemplateProfile {
+            ScanLog.enter("TemplateProfile.parse")
             val root = JSONObject(json)
             val barcodeJson = root.getJSONObject("barcode")
             val formats = barcodeJson.getJSONArray("formats").let { array ->

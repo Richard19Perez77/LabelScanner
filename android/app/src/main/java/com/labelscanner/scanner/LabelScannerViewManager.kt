@@ -6,9 +6,14 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
 
 class LabelScannerViewManager : SimpleViewManager<LabelScannerView>() {
+    init {
+        ScanLog.enter("LabelScannerViewManager.init")
+    }
+
     override fun getName(): String = REACT_CLASS
 
     override fun createViewInstance(reactContext: ThemedReactContext): LabelScannerView {
+        ScanLog.enter("LabelScannerViewManager.createViewInstance")
         return LabelScannerView(reactContext)
     }
 
@@ -19,6 +24,7 @@ class LabelScannerViewManager : SimpleViewManager<LabelScannerView>() {
 
     @ReactProp(name = "templateJson")
     fun setTemplateJson(view: LabelScannerView, json: String?) {
+        ScanLog.enter("LabelScannerViewManager.setTemplateJson")
         if (!json.isNullOrBlank()) {
             view.applyTemplateJson(json)
         }
@@ -45,6 +51,7 @@ class LabelScannerViewManager : SimpleViewManager<LabelScannerView>() {
     }
 
     override fun onDropViewInstance(view: LabelScannerView) {
+        ScanLog.enter("LabelScannerViewManager.onDropViewInstance")
         view.release()
         super.onDropViewInstance(view)
     }

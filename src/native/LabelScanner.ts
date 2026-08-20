@@ -35,6 +35,7 @@ export const RNLabelScannerView =
 // Undefined on iOS, or if MainApplication did not add LabelScannerPackage.
 const NativeLabelScanner = NativeModules.LabelScannerModule as
   | {
+      trace: (message: string) => void;
       // ImageCapture still → ML Kit OCR inside the ROI.
       captureOcr: () => Promise<boolean>;
       // Decode a PNG from android assets/testdata (Fixtures screen, no camera).
@@ -54,14 +55,31 @@ const unavailable = () =>
   Promise.reject(new Error('LabelScannerModule is only implemented on Android'));
 
 // JS facade so screens never touch NativeModules.LabelScannerModule directly.
+/** One-shot JS startup / action traces; Kotlin writes the same tag in logcat. */
+export function startup(method: string) {
+  console.log('[Rick]', method);
+  NativeLabelScanner?.trace?.(method);
+}
+
 export const LabelScanner = {
-  // ?. skips the call if the module is missing; ?? runs unavailable() instead.
-  captureOcr: () => NativeLabelScanner?.captureOcr() ?? unavailable(),
-  processTestImage: (assetName: string, templateJson: string) =>
-    NativeLabelScanner?.processTestImage(assetName, templateJson) ?? unavailable(),
-  listTestImages: () => NativeLabelScanner?.listTestImages() ?? unavailable(),
-  resetDuplicateWindow: () =>
-    NativeLabelScanner?.resetDuplicateWindow() ?? unavailable(),
-  // True only when we are on Android and the package was registered.
+  captureOcr: () => {
+    startup('LabelScanner.captureOcr');
+    return NativeLabelScanner?.captureOcr() ?? unavailable();
+  },
+  processTestImage: (assetName: string, templateJson: string) => {
+    startup('LabelScanner.processTestImage');
+    return (
+      NativeLabelScanner?.processTestImage(assetName, templateJson) ??
+      unavailable()
+    );
+  },
+  listTestImages: () => {
+    startup('LabelScanner.listTestImages');
+    return NativeLabelScanner?.listTestImages() ?? unavailable();
+  },
+  resetDuplicateWindow: () => {
+    startup('LabelScanner.resetDuplicateWindow');
+    return NativeLabelScanner?.resetDuplicateWindow() ?? unavailable();
+  },
   isAvailable: Platform.OS === 'android' && NativeLabelScanner != null,
 };

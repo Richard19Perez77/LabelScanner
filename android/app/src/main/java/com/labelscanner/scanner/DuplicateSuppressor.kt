@@ -19,6 +19,7 @@ class DuplicateSuppressor(var windowMs: Long = 1500L) {
     }
 
     fun reset() {
+        ScanLog.enter("DuplicateSuppressor.reset")
         lastKey = null
         lastAcceptedAt = 0L
     }
