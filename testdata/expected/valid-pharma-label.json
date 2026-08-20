@@ -1,0 +1,12 @@
+{
+  "image": "valid-pharma-label.png",
+  "barcode": {
+    "value": "5901234123457",
+    "format": "EAN_13",
+    "valid": true
+  },
+  "fields": {
+    "lotNumber": { "value": "ABC1234", "valid": true },
+    "expiryDate": { "value": "12/31/2027", "valid": true }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "pharma-label-v1",
+  "name": "Pharmaceutical bottle label",
+  "duplicateWindowMs": 1500,
+  "barcode": {
+    "formats": ["EAN_13", "CODE_128", "QR_CODE"],
+    "checksum": "ean13"
+  },
+  "fields": [
+    {
+      "name": "lotNumber",
+      "label": "Lot Number",
+      "anchors": ["LOT", "BATCH", "LOT NO"],
+      "regex": "^[A-Z0-9]{6,12}$",
+      "checksum": "none"
+    },
+    {
+      "name": "expiryDate",
+      "label": "Expiry Date",
+      "anchors": ["EXP", "EXPIRY", "USE BY", "EXP DATE"],
+      "regex": "^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/20[2-9][0-9]$",
+      "checksum": "none"
+    }
+  ]
+}

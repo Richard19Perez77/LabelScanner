@@ -1,0 +1,12 @@
+{
+  "image": "invalid-lot-regex.png",
+  "barcode": {
+    "value": "5901234123457",
+    "format": "EAN_13",
+    "valid": true
+  },
+  "fields": {
+    "lotNumber": { "value": "AB#12", "valid": false },
+    "expiryDate": { "value": "12/31/2027", "valid": true }
+  }
+}

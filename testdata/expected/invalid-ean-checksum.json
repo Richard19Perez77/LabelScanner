@@ -1,0 +1,12 @@
+{
+  "image": "invalid-ean-checksum.png",
+  "barcode": {
+    "value": "5901234123450",
+    "format": "EAN_13",
+    "valid": false
+  },
+  "fields": {
+    "lotNumber": { "value": "XYZ9876", "valid": true },
+    "expiryDate": { "value": "06/15/2028", "valid": true }
+  }
+}
