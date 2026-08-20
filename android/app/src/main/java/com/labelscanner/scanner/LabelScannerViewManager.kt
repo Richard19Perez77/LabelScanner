@@ -5,6 +5,17 @@ import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
 
+/**
+ * The camera preview is the other half of the same package:
+ *      LabelScannerViewManager / LabelScannerView,
+ *      mounted as <RNLabelScannerView />.
+ *
+ * Live barcodes come from the view.
+ *
+ *  OCR stills go view ← module
+ *      (captureOcr finds LabelScannerView.current and calls captureOcr() on it).
+ *
+ */
 class LabelScannerViewManager : SimpleViewManager<LabelScannerView>() {
     init {
         ScanLog.enter("LabelScannerViewManager.init")

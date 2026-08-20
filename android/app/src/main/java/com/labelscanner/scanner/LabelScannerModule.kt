@@ -7,6 +7,18 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import java.util.concurrent.Executors
 
+/**
+ * LabelScannerModule is the callable API.
+ *
+ * It is a ReactContextBaseJavaModule whose getName() is "LabelScannerModule".
+ * That string is what JS uses: NativeModules.LabelScannerModule.
+ *
+ * Each @ReactMethod is something JS can invoke: captureOcr, processTestImage, listTestImages, resetDuplicateWindow, trace.
+ *
+ * These are commands, not a view: take a still, run a fixture PNG, reset duplicates.
+ *
+ * @property reactContext
+ */
 class LabelScannerModule(private val reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
     private val executor = Executors.newSingleThreadExecutor()
@@ -64,9 +76,7 @@ class LabelScannerModule(private val reactContext: ReactApplicationContext) :
         executor.execute {
             try {
                 val names = reactContext.assets.list("testdata")
-                    ?.filter { it.endsWith(".png", ignoreCase = true) }
-                    ?.sorted()
-                    ?: emptyList()
+                    ?.filter { it.endsWith(".png", ignoreCase = true) }?.sorted() ?: emptyList()
                 val array = Arguments.createArray()
                 names.forEach { array.pushString(it) }
                 promise.resolve(array)

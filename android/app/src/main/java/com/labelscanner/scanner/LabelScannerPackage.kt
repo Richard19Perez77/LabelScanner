@@ -7,6 +7,21 @@ import com.facebook.react.uimanager.ViewManager
 
 /**
  * Registers module + view manager.
+ *
+ * LabelScannerPackage is the catalog.
+ *
+ * RN does not scan the classpath for your classes.
+ *
+ * MainApplication must add(LabelScannerPackage()).
+ *
+ * The package implements ReactPackage and answers two questions:
+ *
+ *      createNativeModules → here is a LabelScannerModule
+ *      createViewManagers → here is a LabelScannerViewManager
+ *
+ * Without the package, JS would never see either one.
+ *
+ * Auto linked libraries ship their own package; this scanner is handwritten, so it is registered by hand.
  */
 class LabelScannerPackage : ReactPackage {
     
