@@ -9,18 +9,18 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 
 class MainApplication : Application(), ReactApplication {
 
-  override val reactHost: ReactHost by lazy {
-    getDefaultReactHost(
-      context = applicationContext,
-      packageList =
-        PackageList(this).packages.apply {
-          add(com.labelscanner.scanner.LabelScannerPackage())
-        },
-    )
-  }
+    override val reactHost: ReactHost by lazy {
+        getDefaultReactHost(
+            context = applicationContext,
+            packageList =
+                PackageList(this).packages.apply {
+                    add(com.labelscanner.scanner.LabelScannerPackage())
+                },
+        )
+    }
 
-  override fun onCreate() {
-    super.onCreate()
-    loadReactNative(this)
-  }
+    override fun onCreate() {
+        super.onCreate()
+        loadReactNative(this)
+    }
 }

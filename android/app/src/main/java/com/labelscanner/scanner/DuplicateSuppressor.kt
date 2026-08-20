@@ -6,20 +6,20 @@ package com.labelscanner.scanner
  * label can re-emit after the window if the operator needs a retry.
  */
 class DuplicateSuppressor(var windowMs: Long = 1500L) {
-  private var lastKey: String? = null
-  private var lastAcceptedAt: Long = 0L
+    private var lastKey: String? = null
+    private var lastAcceptedAt: Long = 0L
 
-  fun isDuplicate(key: String, nowMs: Long): Boolean {
-    val duplicate = key == lastKey && nowMs - lastAcceptedAt < windowMs
-    if (!duplicate) {
-      lastKey = key
-      lastAcceptedAt = nowMs
+    fun isDuplicate(key: String, nowMs: Long): Boolean {
+        val duplicate = key == lastKey && nowMs - lastAcceptedAt < windowMs
+        if (!duplicate) {
+            lastKey = key
+            lastAcceptedAt = nowMs
+        }
+        return duplicate
     }
-    return duplicate
-  }
 
-  fun reset() {
-    lastKey = null
-    lastAcceptedAt = 0L
-  }
+    fun reset() {
+        lastKey = null
+        lastAcceptedAt = 0L
+    }
 }
