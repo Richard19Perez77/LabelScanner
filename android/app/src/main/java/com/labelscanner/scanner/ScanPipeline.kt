@@ -15,16 +15,15 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.util.concurrent.TimeUnit
 
 /**
- * 
- * Turns one still image into a [ScanResultDto]. [processBitmap] crops to the ROI,
- * runs ML Kit barcode (and optional Latin OCR), then [FieldExtractor] plus
- * [Validators] fill lot/expiry and checksums, [DuplicateSuppressor] marks repeats,
- * and [latencyMs] is elapsed time for that still. 
- * 
- * Live preview barcodes skip this class and stay in [LabelScannerView]; OCR captures and fixture PNGs come through
- * here. 
- * 
- * [applyTemplate] rebuilds the barcode client when formats change; [loadAssetBitmap] decodes testdata from assets.
+ *  ScanPipeline is the still-image path: one bitmap in, one ScanResultDto out.
+ *
+ *  It crops to the ROI, runs ML Kit barcode (and OCR when asked), then uses FieldExtractor and Validators for lot/expiry and checksums, DuplicateSuppressor for repeats, and records how long that still took.
+ *
+ *  Live preview barcodes never enter this class — they stay in LabelScannerView.
+ *
+ *  OCR captures and fixture PNGs do.
+ *
+ *  applyTemplate rebuilds the barcode client when formats change; loadAssetBitmap loads test data from assets.
  * 
  */
 class ScanPipeline {

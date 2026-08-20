@@ -125,6 +125,7 @@ data class ScanResultDto(
         map.putBoolean("duplicate", duplicate)
         map.putDouble("latencyMs", latencyMs.toDouble())
         map.putString("rawText", rawText)
+
         if (barcode == null) {
             map.putNull("barcode")
         } else {
@@ -135,7 +136,9 @@ data class ScanResultDto(
             barcodeMap.putBoolean("checksumOk", barcode.checksumOk)
             map.putMap("barcode", barcodeMap)
         }
+
         val fieldsArray: WritableArray = Arguments.createArray()
+
         fields.forEach { field ->
             val fieldMap = Arguments.createMap()
             fieldMap.putString("name", field.name)
@@ -149,6 +152,7 @@ data class ScanResultDto(
             fieldsArray.pushMap(fieldMap)
         }
         map.putArray("fields", fieldsArray)
+
         return map
     }
 
