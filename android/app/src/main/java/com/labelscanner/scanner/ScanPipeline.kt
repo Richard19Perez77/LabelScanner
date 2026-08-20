@@ -14,18 +14,45 @@ import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.util.concurrent.TimeUnit
 
+/**
+ * 
+ * Turns one still image into a [ScanResultDto]. [processBitmap] crops to the ROI,
+ * runs ML Kit barcode (and optional Latin OCR), then [FieldExtractor] plus
+ * [Validators] fill lot/expiry and checksums, [DuplicateSuppressor] marks repeats,
+ * and [latencyMs] is elapsed time for that still. 
+ * 
+ * Live preview barcodes skip this class and stay in [LabelScannerView]; OCR captures and fixture PNGs come through
+ * here. 
+ * 
+ * [applyTemplate] rebuilds the barcode client when formats change; [loadAssetBitmap] decodes testdata from assets.
+ * 
+ */
 class ScanPipeline {
+    
+    // OCR client
     private val textClient: TextRecognizer =
         TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-    private var barcodeClient: BarcodeScanner = BarcodeScanning.getClient()
+    
+    // Barcode client
+    private var barcodeClient: BarcodeScanner = 
+        BarcodeScanning.getClient()
+
+    // Signature of the barcode formats
     private var barcodeFormatsSignature: String? = null
+
+    // Duplicate suppressor
     val suppressor = DuplicateSuppressor()
 
     init {
+        // Log the init of the scan pipeline.
         ScanLog.enter("ScanPipeline.init")
     }
 
+    /**
+     * Applies the template to the scan pipeline.
+     */
     fun applyTemplate(template: TemplateProfile) {
+        // Log the apply template of the scan pipeline.
         ScanLog.enter("ScanPipeline.applyTemplate")
         suppressor.windowMs = template.duplicateWindowMs
         val signature = template.barcode.formats.sorted().joinToString(",")

@@ -31,10 +31,12 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Native camera view shown from React Native.
  *
  * Live preview and barcode detection run here in Kotlin (CameraX + ML Kit).
- * JS only hosts this view and displays results. OCR still uses a still capture
- * ([captureOcr]), not the live analysis stream.
+ * JS only hosts this view and displays results. 
+ * OCR still uses a still capture ([captureOcr]), not the live analysis stream.
  *
- * Debugger note: attach Java only. Dual/Native (LLDB) can freeze CameraX.
+ * Debugger note: 
+ *      - attach Java only. 
+ *      - Dual/Native (LLDB) can freeze CameraX.
  */
 @SuppressLint("ViewConstructor")
 class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayout(reactContext) {
@@ -50,6 +52,8 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
 
     // ML Kit barcode work. Separate so analysis is not blocked while decoding.
     private val barcodeExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    
+    // The pipeline that processes the frames and barcodes.
     private val pipeline = ScanPipeline()
     private var cameraProvider: ProcessCameraProvider? = null
     private var imageCapture: ImageCapture? = null

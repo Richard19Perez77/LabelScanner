@@ -5,7 +5,11 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.uimanager.ViewManager
 
+/**
+ * Registers module + view manager.
+ */
 class LabelScannerPackage : ReactPackage {
+    
     init {
         ScanLog.enter("LabelScannerPackage.init")
     }

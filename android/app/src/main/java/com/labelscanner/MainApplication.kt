@@ -9,6 +9,10 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.labelscanner.scanner.LabelScannerPackage
 import com.labelscanner.scanner.ScanLog
 
+/**
+ * 
+ * Starts RN, adds the scanner package.
+ */
 class MainApplication : Application(), ReactApplication {
 
     override val reactHost: ReactHost by lazy {
