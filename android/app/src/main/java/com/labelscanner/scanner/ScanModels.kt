@@ -5,6 +5,9 @@ import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
 import org.json.JSONObject
 
+//Scan Models - contains Shared types: NormalizedRoi, TemplateProfile / field and barcode specs, ScanResultDTO, BarcodeResult, ExtractedField, OrcBlock, plus JSON parse and RN WritableMap.
+// Depends on org.json and the RN bridge. Almost every other file uses these types.
+
 data class NormalizedRoi(
     val left: Float,
     val top: Float,
@@ -16,6 +19,7 @@ data class NormalizedRoi(
         val t = top.coerceIn(0f, 1f)
         val r = right.coerceIn(0f, 1f)
         val b = bottom.coerceIn(0f, 1f)
+
         return NormalizedRoi(
             left = minOf(l, r),
             top = minOf(t, b),
@@ -50,6 +54,7 @@ data class TemplateProfile(
     val fields: List<FieldSpec>,
 ) {
     companion object {
+
         fun parse(json: String): TemplateProfile {
             ScanLog.enter("TemplateProfile.parse")
             val root = JSONObject(json)
@@ -71,6 +76,7 @@ data class TemplateProfile(
                     checksum = item.optString("checksum", "none"),
                 )
             }
+
             return TemplateProfile(
                 id = root.getString("id"),
                 name = root.getString("name"),

@@ -14,16 +14,18 @@ import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.util.concurrent.TimeUnit
 
+// Still-image path only: crop -> ML Kit barcode/OCR -> fields/checksums -> duplicate flag. Used by OCR capture and fixture PNGs. Depends on ML Kit, RoiCropper, FieldExtractor, Validators, MlKitFormats, DuplicateSuppressor, ScanModels. Live preview barcodes do not go through this class.
+
 /**
  *  ScanPipeline is the still-image path: one bitmap in, one ScanResultDto out.
  *
  *  It crops to the ROI, runs ML Kit barcode (and OCR when asked), then uses FieldExtractor and Validators for lot/expiry and checksums, DuplicateSuppressor for repeats, and records how long that still took.
  *
  *  Live preview barcodes never enter this class — they stay in LabelScannerView.
+ *      OCR captures and fixture PNGs do.
  *
- *  OCR captures and fixture PNGs do.
- *
- *  applyTemplate rebuilds the barcode client when formats change; loadAssetBitmap loads test data from assets.
+ *  applyTemplate rebuilds the barcode client when formats change;
+ *      loadAssetBitmap loads test data from assets.
  * 
  */
 class ScanPipeline {

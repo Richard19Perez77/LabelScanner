@@ -1,5 +1,7 @@
 package com.labelscanner.scanner
 
+// Drops the same barcode / result key if it repeats inside windowMs. No Android APIs. Held by ScanPipeline; live path in LabelScannerView calls that same suppressor.
+
 /**
  * Emits a value at most once per [windowMs] for the same key. A different key
  * always passes. The cooldown is not extended on suppressed hits, so a held

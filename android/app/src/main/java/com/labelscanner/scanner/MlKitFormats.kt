@@ -2,7 +2,13 @@ package com.labelscanner.scanner
 
 import com.google.mlkit.vision.barcode.common.Barcode
 
+/**
+ * Maps template names (EAN_13, QR_CODE,...) to ML Kit ints and back. Depends on ML Kit Barcode.
+ *
+ * Used when building barcode clients in the view and pipeline.
+ */
 object MlKitFormats {
+
     fun name(format: Int): String {
         return when (format) {
             Barcode.FORMAT_EAN_13 -> "EAN_13"

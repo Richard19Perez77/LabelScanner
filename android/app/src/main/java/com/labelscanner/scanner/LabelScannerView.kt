@@ -27,6 +27,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
+// The Camera UI: CameraX preview, live ML Kit barcodes, still capture for OCR, events to JS. Depends on CameraX, ML Kit barcodes, ScanPipeline (OCR stills + duplicate window), RoiCropper, Validators, MlKitFormats, ScanModels, and LabelScannerView.current for the module.
+
 /**
  * Native camera view shown from React Native.
  *
@@ -204,7 +206,7 @@ class LabelScannerView(private val reactContext: ThemedReactContext) : FrameLayo
         val bitmap: Bitmap
         try {
             bitmap = imageProxy.toBitmap()
-        } catch (error: Exception) {
+        } catch (_: Exception) {
             imageProxy.close()
             return
         }

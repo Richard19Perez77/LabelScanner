@@ -5,6 +5,9 @@ import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
 
+// Creates <RNLabelScannerView /> and maps JS props (scanningEnabled, templateJson, roi) onto LabelScannerView. 
+// Depends on RN SimpleViewManager and NormalizedRoi.
+
 /**
  * The camera preview is the other half of the same package:
  *      LabelScannerViewManager / LabelScannerView,
@@ -17,6 +20,7 @@ import com.facebook.react.uimanager.annotations.ReactProp
  *
  */
 class LabelScannerViewManager : SimpleViewManager<LabelScannerView>() {
+    
     init {
         ScanLog.enter("LabelScannerViewManager.init")
     }

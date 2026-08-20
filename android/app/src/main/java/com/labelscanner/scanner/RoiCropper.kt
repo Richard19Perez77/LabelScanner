@@ -4,7 +4,11 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import kotlin.math.roundToInt
 
+/**
+ * Turns 0-1 ROI into pixels, crops bitmaps, tests barcode boxes vs ROI, and accounts for camera rotation. Depends on Android Bitmap/Rect and NormalizedRoi. Used by LabelScannerView and ScanPipeline.
+ */
 object RoiCropper {
+
     fun uprightSize(width: Int, height: Int, rotationDegrees: Int): Pair<Int, Int> {
         return if (rotationDegrees % 180 == 0) width to height else height to width
     }

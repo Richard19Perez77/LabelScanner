@@ -2,8 +2,10 @@ package com.labelscanner.scanner
 
 import android.util.Log
 
+// helper for logging, uses basic log class.
 internal object ScanLog {
 
+    // unique id in logcat tag:Rick
     const val TAG = "Rick"
 
     fun enter(method: String) {

@@ -1,6 +1,12 @@
 package com.labelscanner.scanner
 
+/**
+ * Regex + optional EAN-13 check digit for fields and barcodes. Depends only on ScanModels (FieldSpec, BarcodeSpec).
+ *
+ * Used by FieldExtractor and live barcode handling in LabelScannerView.
+ */
 object Validators {
+
     fun matchesRegex(value: String, regex: String): Boolean {
         return Regex(regex).matches(value.trim())
     }

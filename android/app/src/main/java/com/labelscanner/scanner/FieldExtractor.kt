@@ -4,7 +4,11 @@ import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.min
 
+/**
+ * Pull lot/expiry (etc.) from OCR blocks: same-line anchors, spatial neighbors, then regex hunt. Depends on OrcBlock, FieldSpec / TemplateProfile, and Validators. Used only form ScanPipeline when OCR is on.
+ */
 object FieldExtractor {
+
     fun extract(blocks: List<OcrBlock>, spec: FieldSpec): ExtractedField {
         val fullText = blocks.joinToString("\n") { it.text }
 
