@@ -1,0 +1,36 @@
+# Copy to: LabelScanner/.github/workflows/ci.yml
+# (repo root that contains package.json and android/)
+
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  jest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm test -- --ci --watchAll=false
+
+  android-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x android/gradlew
+      - name: Android JVM tests
+        working-directory: android
+        run: ./gradlew :app:testDebugUnitTest --no-daemon
